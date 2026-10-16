@@ -1,0 +1,132 @@
+-- Petrova.Y MM2 Suite (Apenas Gerenciador de Neblina)
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+
+-- Cleanup GUI anterior
+if game.CoreGui:FindFirstChild("PetrovaMM2GUI") then
+    game.CoreGui.PetrovaMM2GUI:Destroy()
+end
+
+--------------------------------------------------------------------------------
+-- CONFIGURAÇÃO DE ILUMINAÇÃO
+--------------------------------------------------------------------------------
+Lighting.ClockTime = 0
+Lighting.Brightness = 1
+Lighting.GlobalShadows = true
+
+local fogEnabled = true
+local currentFogColor = Color3.fromRGB(255, 0, 0) -- Neblina Vermelha padrão
+
+local function applyFogSettings()
+    if fogEnabled then
+        Lighting.FogColor = currentFogColor
+        Lighting.FogStart = 10
+        Lighting.FogEnd = 250
+    else
+        Lighting.FogStart = 999999
+        Lighting.FogEnd = 999999
+    end
+end
+applyFogSettings()
+
+--------------------------------------------------------------------------------
+-- GUI PRINCIPAL (PRETO COM BORDAS VERMELHAS)
+--------------------------------------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PetrovaMM2GUI"
+ScreenGui.Parent = game.CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 260, 0, 140)
+MainFrame.Position = UDim2.new(0.5, -130, 0.35, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(220, 20, 20)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 35)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "PETROVA.Y - NEBLINA"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 30, 30)
+TitleLabel.TextSize = 16
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.Parent = MainFrame
+
+--------------------------------------------------------------------------------
+-- BOTÃO DE NEBLINA (ON / OFF)
+--------------------------------------------------------------------------------
+local FogToggleBtn = Instance.new("TextButton")
+FogToggleBtn.Size = UDim2.new(0, 220, 0, 35)
+FogToggleBtn.Position = UDim2.new(0.5, -110, 0, 42)
+FogToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+FogToggleBtn.BorderSizePixel = 1
+FogToggleBtn.BorderColor3 = Color3.fromRGB(255, 30, 30)
+FogToggleBtn.Text = "Neblina: ON"
+FogToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FogToggleBtn.Font = Enum.Font.GothamBold
+FogToggleBtn.TextSize = 13
+FogToggleBtn.Parent = MainFrame
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 6)
+BtnCorner.Parent = FogToggleBtn
+
+FogToggleBtn.MouseButton1Click:Connect(function()
+    fogEnabled = not fogEnabled
+    if fogEnabled then
+        FogToggleBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+        FogToggleBtn.Text = "Neblina: ON"
+    else
+        FogToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        FogToggleBtn.Text = "Neblina: OFF"
+    end
+    applyFogSettings()
+end)
+
+--------------------------------------------------------------------------------
+-- SELEÇÃO DE CORES DA NEBLINA
+--------------------------------------------------------------------------------
+local ColorFrame = Instance.new("Frame")
+ColorFrame.Size = UDim2.new(0, 230, 0, 30)
+ColorFrame.Position = UDim2.new(0.5, -115, 0, 90)
+ColorFrame.BackgroundTransparency = 1
+ColorFrame.Parent = MainFrame
+
+local colors = {
+    {Color3.fromRGB(255, 0, 0), "Vermelho"},
+    {Color3.fromRGB(0, 120, 255), "Azul"},
+    {Color3.fromRGB(0, 255, 100), "Verde"},
+    {Color3.fromRGB(180, 0, 255), "Roxo"},
+    {Color3.fromRGB(255, 220, 0), "Amarelo"},
+    {Color3.fromRGB(0, 255, 255), "Ciano"},
+    {Color3.fromRGB(255, 255, 255), "Branco"}
+}
+
+for i, colorData in ipairs(colors) do
+    local cBtn = Instance.new("TextButton")
+    cBtn.Size = UDim2.new(0, 26, 0, 26)
+    cBtn.Position = UDim2.new(0, (i - 1) * 33 + 2, 0, 2)
+    cBtn.BackgroundColor3 = colorData[1]
+    cBtn.BorderSizePixel = 1
+    cBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+    cBtn.Text = ""
+    cBtn.Parent = ColorFrame
+
+    local cCorner = Instance.new("UICorner")
+    cCorner.CornerRadius = UDim.new(0, 4)
+    cCorner.Parent = cBtn
+
+    cBtn.MouseButton1Click:Connect(function()
+        currentFogColor = colorData[1]
+        applyFogSettings()
+    end)
+end
